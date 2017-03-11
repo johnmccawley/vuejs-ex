@@ -183,11 +183,11 @@
                                     },
                                     {
                                         "name": "MONGODB_USER",
-                                        "value": "${MONGODB_USER}"
+                                        "value": "${DATABASE_USER}"
                                     },
                                     {
                                         "name": "MONGODB_PASSWORD",
-                                        "value": "${MONGODB_PASSWORD}"
+                                        "value": "${DATABASE_PASSWORD}"
                                     },
                                     {
                                         "name": "MONGODB_DATABASE",
@@ -195,7 +195,7 @@
                                     },
                                     {
                                         "name": "MONGODB_ADMIN_PASSWORD",
-                                        "value": "${MONGODB_ADMIN_PASSWORD}"
+                                        "value": "${DATABASE_ADMIN_PASSWORD}"
                                     }
                                 ],
                                 "resources": {
@@ -334,20 +334,20 @@
             "displayName": "Name",
             "description": "The name assigned to all of the frontend objects defined in this template.",
             "generate": "expression",
-            "from": "qs-mven[A-Z0-9]{3}"
+            "from": "qs-mven[a-z0-9]{3}"
         },
         {
             "name": "MEMORY_LIMIT",
             "displayName": "Memory Limit",
             "description": "Maximum amount of memory the Node.js container can use.",
-            "value": "512Mi",
+            "value": "256Mi",
             "required": true
         },
         {
             "name": "MEMORY_MONGODB_LIMIT",
             "displayName": "Memory Limit (MongoDB)",
             "description": "Maximum amount of memory the MongoDB container can use.",
-            "value": "512Mi",
+            "value": "200Mi",
             "required": true
         },
         {

@@ -20,30 +20,11 @@ If you haven't set up development environment with GitHub and Digital Garage, yo
 
 After you have signed up for/signed into your Github account, fork the [thedigitalgarage/vue.js](https://github.com/thedigitalgarage/vuejs-ex) repository into your own account. This repository contains some files and a file structure that will give you a quick start on your Vue.js application.
 
-After signing into your Digital Garage account, deploy the Vue.js Full-stack Quickstart (qs-mven). There's a detailed walkthrough of setting up an application throught the web console and command line interface on the Digital Garage documentation site.Choose the Add to Project link in the top menu bar to go to the template catalog.
-
-![Add To Project](http://assets-digitalgarage-infra.apps.thedigitalgarage.io/images/screenshots/add_to_project.png)
-
-In the add to project screen, choose the Vue.js Full-stack Quickstart (qs-mven) from the catalog.
-
-![Add To Project](http://assets-digitalgarage-infra.apps.thedigitalgarage.io/images/screenshots/choose_quickstart.png)
-
-In the template configuration page change the Git Repository URL to point to the repository that was just forked into your account. `https://github.com/johnmccawley/vuejs-ex-ex.git` You can simply accept the defaults for the remaining parameters and click "Create"
-
-![Add To Project](http://assets-digitalgarage-infra.apps.thedigitalgarage.io/images/screenshots/quickstart-configure.png)
-
-That's it. Digital Garage is now setting up your Vue.js application, Mongo database, and NodeJS preconfigured with Express. On the next screen click "Continue to Overview". You will be taken to the Project Overview screen where you can watch Digital Garage do the setup work for you. In just a few minutes you'll have full stack running in containers and managed through Google Kubernetes. When MongoDB and NodeJS are completely deployed, (the pod status circle is Green) simply click on the application URL in the upper right corner of the overview screen. You will be taken to a browser to see a simple "Hello World" message.
-
-Before you actually start the tutorial, you may want to become more familiar with the features of Digital Garage that make your life as a developer easier.
-Features like:
-
-+ [A command line interface (CLI)](http://docs.thedigitalgarage.io/getting_started/developers_cli.html)
-+ [Support for Github webhooks](http://docs.thedigitalgarage.io/getting_started/basic_walkthrough.html#bw-configuring-automated-builds)
-
+After signing into your Digital Garage account, deploy the Vue.js Full-stack Quickstart (qs-mven). There's a detailed walkthrough of setting up an application through the web console and command line interface on the [Digital Garage documentation site](http://docs.thedigitalgarage.io/getting_started/basic_walkthrough.html).
 
 ## File Structure
 
-Now that we have the MEAN Example repository forked into your account, let's take a few minutes to review the file structure for the repository. There are many ways to structure a MEAN application. I have tried to take the best-practices from several tutorials and create a simple yet expandable file structure this example project. For further reading on file structures for the MEAN Stack, [Mean.io](http://mean.io) is a good boilerplate to see best practices and how to separate file structure. For now, though, we will just use the following structure adjust as we go.
+To keep it simple and provide a good basis for comparison, I am going to follow the same file structure that I used for the MEAN Stack tutorial.
 
 ```
 
@@ -55,8 +36,8 @@ Now that we have the MEAN Example repository forked into your account, let's tak
     - config                    <!-- all our configuration will be here -->
     ----- database.js
 
-    - public                    <!-- holds all our files for our frontend angular application -->
-    ----- app.js                <!-- all angular code for our app -->
+    - public                    <!-- holds all our files for our front-end vue.js application -->
+    ----- app.js                <!-- all vue.js code for our app -->
     ----- index.html            <!-- main view -->
 
     - package.json              <!-- npm configuration to install dependencies/modules -->
@@ -64,9 +45,9 @@ Now that we have the MEAN Example repository forked into your account, let's tak
 
 ```
 
-### Installing Modules
+## Installing Modules
 
-In Node, the `package.json` file holds the configuration for our app. Node’s package manager (npm) will use this to install any dependencies or modules that we are going to use. In our case, the Digital Garage Quickstart template read the package.json file and installed all of the packages we need. As with a standard npm install, you can change the `package.json` to include or exclude modules. For this example, we will, of course, be using [Express](http://expressjs.com/) (the "E" in MEAN) and [Mongoose](http://mongoosejs.com/) (a popular object modeling module for MongoDB).
+In Node, the `package.json` file holds the configuration for our app. Node’s package manager (npm) will use this to install any dependencies or modules that we are going to use. In our case, the Digital Garage Quickstart template read the package.json file and installed all of the packages we need. As with a standard npm install, you can change the `package.json` to include or exclude modules. Again, we will be using [Express](http://expressjs.com/) and [Mongoose](http://mongoosejs.com/) (a popular object modeling module for MongoDB). We have the option here of installing Vue.js as a package via npm. For simplicity, I am loading the Vue.js javascript file in our index.html page.
 
 ```
 
@@ -89,17 +70,15 @@ In Node, the `package.json` file holds the configuration for our app. Node’s p
 
 ```
 
-### Node.js Configuration
+## Node.js Configuration
 
-Our `package.json` file sets the "start" script for node to `server.js`. This is the main file for our Node app and where we will configure the entire application.
+The `server.js` is the main file for our Node app and where we will configure the entire application.
 
-This is the file where we will:
+In this file we will:
 
 *   Configure our application
 *   Connect to our database
 *   Set the app to listen on a port so we can view it in our browser
-
-You may also notice that we are collecting some environment variables from our Digital Garage environment, `process.env.PORT`. This just makes our configuration easier and more portable. We will discuss these features in more detail in later tutorials. For now, it is only important to understand that environment varialbles are helping us configure the app for Express, our MongoDB database, and listening on a port.
 
 ```
 // server.js
@@ -108,9 +87,9 @@ You may also notice that we are collecting some environment variables from our D
 var express = require('express');
 var app = express(); // create our app w/ express
 var fs = require('fs')
-var mongoose = require('mongoose'); // mongoose for mongodb
 var morgan = require('morgan'); // log requests to the console (express4)
 var bodyParser = require('body-parser'); // pull information from HTML POST (express4)
+var mongoose = require('mongoose'); // mongoose for mongodb
 var database = require('./config/database'); //load the database config
 
 // configuration =================
@@ -123,35 +102,23 @@ app.use(bodyParser.json({type: 'application/vnd.api+json'})); // parse applicati
 var port = process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 8080,
     ip = process.env.IP || process.env.OPENSHIFT_NODEJS_IP || '0.0.0.0';
 
-mongoose.connect(database.url);// connect to mongoDB database
+// connect to MongoDB database
+mongoose.connect(database.url);
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 
 // listen (start app with node server.js) ======================================
 app.listen(port, ip);
-console.log('Server running on http://%s:%s', ip, port);
+  console.log('Server running on http://%s:%s', ip, port);
 
 module.exports = app;
 
 ```
+This file looks very similar to the `server.js` file we created for the MEAN Stack. That makes sense because the front-end application will be in Vue.js but the back end services will still be NodeJS, Express and MongoDB. If want more details on setting up the back-end services, including MongoDB and Mongoose, take a look at my previous post on the MEAN Stack. The back-end is exactly the same.
 
-Just with that bit of code, we now have an HTTP server courtesy of Node. We have also created an app with Express and now have access to many benefits of it. In our `app.configure` section, we are using express modules to add more functionality to our application.
+## Vue.js Tutorial: The Tasklist Application
 
-### Database Setup
-
-We will be using a local database that the Digital Garage Quickstart template has deployed for us. Digital Garage has automatically deployed a MongoDB in a Docker Container and provided us with a network address to connect to the database. The database URL is configured in `config/database.js` and used in the `mongoose.connect` command to connect to it. In the current "Hello World" example, the database connection is not being used. We will use that connection later in the tutorial. For now, as long as logs for the NodeJS application do not show you a database connection error, you are connected to the database.
-
-## Building our Tasklist Application
-
-### Application Flow
-
-There are a lot of different ideas and technologies involved in this simple application. It is easy to get confused during the setup. If you just take a few minutes to understand the flow and the components of this MEAN Stack tutorial, it will be much easier.
-
-You are going to be implementing this tutorial through a design or software architecture best practice known as a microservices architecture. There is a lot of information about the definition, benefits and pitfalls of microservices available on the web. For now, however, it is only important to know that Digital Garage is handling all of the difficult details of Microservices in the background. You simply need to configure your application to take advantage of those best practices. In the next few paragraphs, I will explain a bit of the separation of tasks and how the services tie together.
-
-AngularJS is the framework that will handle the front-end work. It will access all the data it needs through a the Node.js RESTful API. The AngularJS application then, is considered a microservice. It is self contained and interacts with other microservices.
-
-In this tutorial we will be implementing a small Node.js application (or microservice) that retrieves data from the database and returns that data in JSON format to our AngularJS application via a RESTful API. In this way, you can separate the frontend application from the actual API. If you want to extend the API, you can do so without affecting the front-end application. You can eventually build different microservices (or apps) on different platforms, or even different languages that simply connect to this REST-based API.
+A quick note about application flow: a primary goal in this tutorial is to provide a basis of comparison between Vue.js and AngularJS in full-stack applications. Because of that, I have decided to keep the application flow exactly the same as the previous MEAN Stack tutorial. I will republish some of the steps that we took to set up the RESTful API and the database model in summary form. As with previous steps, if you want the details, the best resource is either my previous post or the Digital Garage documentation site.
 
 ### Creating Our RESTful API on Node.js
 
@@ -251,28 +218,25 @@ Now that we’ve defined our routes, we update the `server.js` to `require` our 
 
 
 
-## Front-end Application with Angular
+## Front-end Application with Vue.js
 
 Let's do a quick recap of what we have accomplished. So far, we have:
 
-+ set up our MEAN Stack
++ set up our stack in a Digital Garage development environment.
 + built our task model in MongoDB with the help of Mongoose
 + created a Node.js microservice with RESTful API's to get, create and remove tasks.
 
-The application you have built so far could stand alone as a RESTful API serving up our task data to other applications. We're not going to stop there, though. We're going to create a frontend application in AngularJS that will use the RESTful API that we just built. The AngularJS appliction will use the **GET** endpoint to retrieve the task list, the **POST** endpoint to create a task and then retrieve the new task list and the **DELETE** endpoint to remove a task from the task list and retrieve the new task list. This will all be presented in our single page web application.
+The application you have built so far could stand alone as a RESTful API serving up our task data to other applications. Now we'll create a front-end application in Vue.js that will use the RESTful API. This will all be presented in a single page web application.
 
-To get started we will use the `app.js` file and the `index.html` file that we used for our "Hello World" example application. With a few simple modifications we will have our new front-end application.
+### Setting Up Vue.js
 
-### Setting Up AngularJS app.js
+Unlike AngularJS which is closer to the MVC (Model-View-Controller) pattern, Vue.js follows the MVVM or Model-View-View Model pattern. I am not going to get into the details of the debate between the two models in this tutorial, but rather, I will focus on how the two frameworks differ because they follow different patterns.
 
-AngularJS is what we refer to as a Model-View-Controller (MVC) framework. MVC frameworks have been around for a long time. Frameworks that use the MVC pattern are very popular for front-end web applications because they treat the data (the model), the screenflow (the controller) and the presentation of the data (the view) as seperate "concerns". In other words, it makes an application easier to maintain if you keep all of the code that moves you from one screen to the next in a file called a controller, all of the data in a model and all of the presentation code in the view. Again, you do not need to know the details of the Model-View-Controller pattern to write AngularJS applications, but if you are interested in learning more, I suggest reading this [tutorial](http://www.angularjstutorial.com/2014/02/12/angularjs-basics-part-1-the-model-view-controller-approach/)
+Let’s go through our Vue.js setup first. We will do the following:
 
-Let’s go through our Angular setup first. We will do the following:
-
-+ create a module,
-+ create a controller,
-+ and define functions to handle tasks,
-+ apply to view.
++ declare a view model and create a Vue instance,
++ define functions to handle tasks in our view model,
++ use directives to bind our view to our view model.
 
 In the `app.js` file we will create a module `helloTaskList` and a controller `MainCtrl`. Since we are starting with the `app.js` file from our "Hello World" example, the easiest thing to do is cut and paste the code below to replace the existing module and controller in `app.js`. However, you will get a better understanding of the syntax if you move through the file and replace the code line by line.
 
